@@ -55,5 +55,4 @@ fn main() {
     let p2_ans = part_2(&numbs);
     println!("Part 1 : {}", p1_ans);
     println!("Part 2 : {}", p2_ans);
-    println!("Hello, world!");
 }
