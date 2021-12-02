@@ -1,43 +1,24 @@
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
+extern crate file_reader;
+use file_reader::read_file;
 
 #[derive(Debug)]
 enum Command {
     Up(u32),
     Down(u32),
     Forward(u32),
-   
 }
 
 type Commands = Vec<Command>;
 
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where
-    P: AsRef<Path>,
-{
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
-}
-
-fn read_file(filename: &str) -> Commands {
-    let mut commands: Commands = Vec::new();
-
-    if let Ok(lines) = read_lines(filename) {
-        for line in lines {
-            if let Ok(ip) = line {
-                let c  = ip.split(' ').collect::<Vec<&str>>();
-                let val = c[1].parse::<u32>().unwrap();
-                match c[0] {
-                    "up" => commands.push(Command::Up(val)),
-                    "down" => commands.push(Command::Down(val)),
-                    "forward" => commands.push(Command::Forward(val)),
-                    _ => panic!("invalid command")
-                }
-            }
-        }
+fn parse_commands(s: &str, commands: &mut Commands) {
+    let c = s.split(' ').collect::<Vec<&str>>();
+    let val = c[1].parse::<u32>().unwrap();
+    match c[0] {
+        "up" => commands.push(Command::Up(val)),
+        "down" => commands.push(Command::Down(val)),
+        "forward" => commands.push(Command::Forward(val)),
+        _ => panic!("invalid command"),
     }
-    commands
 }
 
 fn part_1(commands: &Commands) -> u32 {
@@ -48,11 +29,11 @@ fn part_1(commands: &Commands) -> u32 {
         match command {
             Command::Up(n) => depth -= n,
             Command::Down(n) => depth += n,
-            Command::Forward(n) => hoz += n
+            Command::Forward(n) => hoz += n,
         }
-    };
+    }
 
-    depth * hoz    
+    depth * hoz
 }
 
 fn part_2(commands: &Commands) -> u32 {
@@ -69,14 +50,14 @@ fn part_2(commands: &Commands) -> u32 {
                 depth += aim * n
             }
         }
-    };
+    }
 
     depth * hoz
 }
 
-
 fn main() {
-    let commands = read_file("puzzle.txt");
+    let mut commands = Commands::new();
+    read_file("puzzle.txt", parse_commands, &mut commands);
 
     let ans_1 = part_1(&commands);
     println!("Part 1: {}", ans_1);

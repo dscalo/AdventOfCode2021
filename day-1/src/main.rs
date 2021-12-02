@@ -1,28 +1,5 @@
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
-
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where
-    P: AsRef<Path>,
-{
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
-}
-
-fn read_file(filename: &str) -> Vec<u32> {
-    let mut numbs = Vec::new();
-
-    if let Ok(lines) = read_lines(filename) {
-        for line in lines {
-            if let Ok(ip) = line {
-                let num = ip.parse::<u32>().unwrap();
-                numbs.push(num);
-            }
-        }
-    }
-    numbs
-}
+extern crate file_reader;
+use file_reader::read_file;
 
 fn part_1(numbs: &Vec<u32>) -> u32 {
     let mut increases = 0;
@@ -49,8 +26,14 @@ fn part_2(numbs: &Vec<u32>) -> u32 {
     increases
 }
 
+fn parse_items(s: &str, items: &mut Vec<u32>) {
+    let num = s.parse::<u32>().unwrap();
+    items.push(num);
+}
+
 fn main() {
-    let numbs = read_file("puzzle.txt");
+    let mut numbs: Vec<u32> = Vec::new();
+    read_file("test01.txt", parse_items, &mut numbs);
     let p1_ans = part_1(&numbs);
     let p2_ans = part_2(&numbs);
     println!("Part 1 : {}", p1_ans);
