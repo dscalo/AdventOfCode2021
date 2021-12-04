@@ -7,7 +7,7 @@ type Report = Vec<Vec<char>>;
 struct BitsCount(u32, u32);
 
 fn parse_bits(s: &str, report: &mut Report) {  
-    report.push( s.chars().collect::<Vec<char>>());
+    report.push(s.chars().collect::<Vec<char>>());
 }
 
 fn part_1(report: &Report) -> u32 {
@@ -102,6 +102,7 @@ fn part_2(report: &Report) -> u32 {
             }
         }
     }
+    
     let o_str = oxygen[0].iter().collect::<String>();
     let c_str = c02[0].iter().collect::<String>();
 
