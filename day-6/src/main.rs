@@ -35,7 +35,7 @@ fn part_1(school: &mut SchoolOfFish, days: u32) {
     } 
 }
 
-fn how_may_fish(s: i32, days: i32) -> u64 {
+fn how_may_fish(s: i32, days: i32, f_cache: &mut HashMap<i32, u64>) -> u64 {
     let mut total: u64 = 0;
     let first_spawn_day = days - (s+1);
     if  first_spawn_day < 0 {
@@ -47,9 +47,15 @@ fn how_may_fish(s: i32, days: i32) -> u64 {
     total += f as u64;
     let mut  next_spawn_day: i32 = first_spawn_day;
 
-    while f > 0 {       
-        let e =  how_may_fish(8, next_spawn_day);
-        total += e;
+    while f > 0 {    
+        if f_cache.contains_key(&next_spawn_day) {
+            total += f_cache.get(&next_spawn_day).unwrap();
+        } else {
+            let e =  how_may_fish(8, next_spawn_day, f_cache);
+            total += e;
+            f_cache.insert(next_spawn_day, e);
+        }
+       
         f -= 1;
        
         next_spawn_day = next_spawn_day - 7;       
@@ -59,14 +65,15 @@ fn how_may_fish(s: i32, days: i32) -> u64 {
 
 fn part_2(school: SchoolOfFish, days: i32) -> u64 {
     let mut count =school.len() as u64;
-    let mut cache: HashMap<i32,u64> = HashMap::new();    
+    let mut cache: HashMap<i32,u64> = HashMap::new();  
+    let mut f_cache: HashMap<i32, u64> = HashMap::new();  
    
     for s in school {       
         if cache.contains_key(&s) {
             count += cache.get(&s).unwrap();
             continue;
         }
-        let new_fish = how_may_fish(s, days);
+        let new_fish = how_may_fish(s, days, &mut f_cache);
       
         cache.insert(s, new_fish);
         count += new_fish;
