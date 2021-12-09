@@ -1,8 +1,8 @@
 extern crate file_reader;
 use file_reader::read_file;
 
-mod geometry;
-use crate::geometry::{Line, Point};
+extern crate geometry;
+use geometry::{Line, Point};
 
 type Lines = Vec<Line>;
 type Grid = Vec<Vec<u32>>;
