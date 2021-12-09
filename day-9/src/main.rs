@@ -2,7 +2,7 @@ extern crate file_reader;
 use file_reader::read_file;
 
 extern crate geometry;
-use geometry::{Line, Point};
+use geometry::Point;
 
 type Heightmap = Vec<Vec<i32>>;
 
@@ -18,7 +18,6 @@ fn parse_map(s: &str, heightmap: &mut Heightmap) {
     let numbs = s.chars().map(|c| c.to_string().parse::<i32>().unwrap()).collect::<Vec<i32>>();
     heightmap.push(numbs)
 }
-
 
 fn part_1(heightmap: &Heightmap) -> i32 {
     let mut low_points = 0;
@@ -46,8 +45,6 @@ fn part_1(heightmap: &Heightmap) -> i32 {
             if (x as i32 - 1) as i32 >= 0 && heightmap[y][x-1] <= h {
                 continue
             }
-
-            //println!("h: {}", h);
             low_points += h +1
         }
     }
@@ -104,16 +101,7 @@ fn get_basin_size(start: Point, heightmap: &Heightmap, visited: &mut Vec<Point>)
                 to_visit.push(new_p);               
             }
         }
-
-        //println!("TO VISIT: {:?}", to_visit);
-        
-        
-
     }
-
-    // for v in &visited {
-    //     println!("{:?}", v);
-    // }
      size
     }
 
