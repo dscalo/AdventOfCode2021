@@ -2,10 +2,73 @@ extern crate file_reader;
 use file_reader::read_file;
 
 use std::collections::HashMap;
-use std::collections::VecDeque;
 
 type Graph = HashMap<String, Vec<String>>;
 type Paths = Vec<Vec<String>>;
+
+#[derive(Clone)]
+struct Path {
+    path: Vec<String>,
+    lowers: HashMap<String, u32>,
+    two_lowers: bool,
+    end: bool,
+}
+
+impl Path {
+    fn new(path: Vec<String>) -> Path {
+        let mut l: HashMap<String, u32> = HashMap::new();
+        let mut two_lowers = false;
+
+        for p in &path {
+            if p == &p.to_lowercase() {
+                if l.contains_key(p) {
+                    two_lowers = true;
+                } else {
+                    l.insert(p.clone(), 1);
+                }
+            }
+        }
+        Path {
+            path: path,
+            lowers: l,
+            two_lowers: two_lowers,
+            end: false,
+        }
+    }
+
+    fn insert(&mut self, s: String) {
+        if s == "end".to_string() {
+            self.end = true;
+            return;
+        }
+
+        if s == s.to_lowercase() {
+            if self.lowers.contains_key(&s) {
+                self.two_lowers = true;
+                self.path.push(s.clone());               
+                return;
+            }
+
+            self.lowers.insert(s.clone(), 1);       
+        }
+
+        self.path.push(s.clone());
+    }
+
+    fn can_insert(&self, s: &String) -> bool {
+        if self.end {
+            return false;
+        }
+
+        if s == &s.to_lowercase() {
+            if self.lowers.contains_key(s) && self.two_lowers {
+                return false;
+            }     
+        }
+
+        true
+    }
+}
 
 fn print_graph(graph: &Graph) {
     for (k, v) in graph {
@@ -35,7 +98,6 @@ fn is_uppercase(s: &String) -> bool {
     s == &s.to_uppercase()
 }
 
-
 fn part_1(graph: &Graph) -> u32 {
     let end = "end".to_string();
     let start = "start".to_string();
@@ -45,33 +107,29 @@ fn part_1(graph: &Graph) -> u32 {
 
     loop {
         let mut new_paths: Paths = Paths::new();
-        for n in 0..paths.len() {            
+        for n in 0..paths.len() {
             if !paths[n].contains(&end) {
-                let node = &paths[n][paths[n].len()-1];
-               
+                let node = &paths[n][paths[n].len() - 1];
                 let mut fp = false;
-                let to_clone =  paths[n].clone();
+                let to_clone = paths[n].clone();
                 for g in graph.get(node).unwrap() {
                     if g == &start {
-                        continue
+                        continue;
                     }
-                   
-                    if is_uppercase(g) || g == &end || !paths[n].contains(g) {
 
+                    if is_uppercase(g) || g == &end || !paths[n].contains(g) {
                         if !fp {
                             fp = true;
                             paths[n].push(g.clone());
                             continue;
-
                         }
                         let mut np = to_clone.clone();
                         np.push(g.clone());
                         new_paths.push(np);
                         // println!(" new_paths::{:?}", new_paths);
                         // println!("_________________________________");
-                        continue
+                        continue;
                     }
-                    
                 }
             }
         }
@@ -81,12 +139,10 @@ fn part_1(graph: &Graph) -> u32 {
 
         paths.append(&mut new_paths);
         //  println!(" PATHS::{:?}", paths);
-        // println!("_________________________________");     
-       
+        // println!("_________________________________");
     }
 
     let mut counter = 0;
-    
     for path in paths {
         //println!(" PATH::{:?}", path);
         if path.contains(&end) {
@@ -96,54 +152,37 @@ fn part_1(graph: &Graph) -> u32 {
     counter
 }
 
-fn small_cave_twice(path: &Vec<String>) -> bool {
-    for p in path {
-        if p != &p.to_lowercase() {
-            continue;
-        }
-        if path.iter().filter(|s| s == &p).count() > 1 {
-           
-            return true
-        }
-    }
-
-    false
-}
-
 fn part_2(graph: &Graph) -> u32 {
-    let end = "end".to_string();
     let start = "start".to_string();
-    let mut paths: Paths = Paths::new();
+    let mut paths: Vec<Path> = Vec::new();
 
-    paths.push(vec![start.clone()]);
+    let path = Path::new(vec![start.clone()]);
+
+    paths.push(path);
 
     loop {
-        let mut new_paths: Paths = Paths::new();
-        for n in 0..paths.len() {            
-            if !paths[n].contains(&end) {
-                let node = &paths[n][paths[n].len()-1];
-               
+        let mut new_paths: Vec<Path> = Vec::new();
+        for n in 0..paths.len() {
+            if !paths[n].end {
+                let node = &paths[n].path[paths[n].path.len() - 1];
                 let mut fp = false;
                 let to_clone = paths[n].clone();
                 for g in graph.get(node).unwrap() {
                     if g == &start {
-                        continue
+                        continue;
                     }
-                   
-                    if is_uppercase(g) || g == &end || !to_clone.contains(g) || (to_clone.contains(g) && !small_cave_twice(&to_clone)) {
 
+                    if to_clone.can_insert(g) {
                         if !fp {
                             fp = true;
-                            paths[n].push(g.clone());
+                            paths[n].insert(g.clone());
                             continue;
-
                         }
+
                         let mut np = to_clone.clone();
-                        np.push(g.clone());
-                        new_paths.push(np);                       
-                        continue
+                        np.insert(g.clone());
+                        new_paths.push(np);
                     }
-                    
                 }
             }
         }
@@ -151,14 +190,13 @@ fn part_2(graph: &Graph) -> u32 {
             break;
         }
 
-        paths.append(&mut new_paths);      
-       
+        paths.append(&mut new_paths);
     }
 
     let mut counter = 0;
-    
+
     for path in paths {
-        if path.contains(&end) {
+        if path.end {
             counter += 1;
         }
     }
