@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
