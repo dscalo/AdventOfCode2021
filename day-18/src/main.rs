@@ -7,7 +7,6 @@ type NumberLine = VecDeque<i64>;
 
 fn print_number_line(number_line: &NumberLine) {
     for n in number_line {
-        let mut comma = false;
         match n {
             -1 => print!("["),
             -2 => print!("]"),
