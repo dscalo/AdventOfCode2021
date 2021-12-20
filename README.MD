@@ -11,3 +11,4 @@
     2. Use a priority queue?
  - Day 17: There has to be a better solution than the crap i came up with! Its not that slow but i hate the whole try_again thing..
  - Day 18: Part 2 is slow, but i'm happy with my solution
+ - Day 19: FAILED!
